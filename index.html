@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カップ麺タイマー</title>
+</head>
+
+<body>
+    <main>
+        <div>
+            <img src="food_cup_ramen.png" id="cupmen">
+            <h3>カップ麺タイマー</h3>
+        </div>
+        
+        <form id="selectTime">
+            <label><input type="radio" name="hotWaterIn" value="180000">３分</label>
+            <label><input type="radio" name="hotWaterIn" value="300000">５分</label>
+            <label><input type="radio" name="hotWaterIn" value="600000">１０分</label>
+            <label><input type="radio" name="hotWaterIn" value="5000">Test</label>
+        </form>
+
+        <p id="timer">03:00</p>
+        <button id="btn">Start</button>
+        <h6>声：VOICEBOXずんだもん</h6>
+    </main>
+   
+
+
+    <style>
+        body {
+            background: #e6f6ff;
+        }
+
+        main {
+            background: #fff;
+            width: 320px;
+            margin: 16px auto 0;
+            text-align: center;
+            padding: 16px;
+        }
+
+        div {
+            display: flex;
+            padding-left: 20px;
+        }
+
+        h3 {
+            color: red;
+        }
+
+        img {
+            width: 40px;
+            height: 40px;
+        }
+
+        p {
+            margin: 0;
+            background: #ddd;
+            padding: 32px 0;
+            font-size: 40px;
+            font-family: 'Courier New';
+        }
+
+        button {
+            all: unset;
+            width: 100%;
+            background: #08c;
+            color: #fff;
+            font-weight: bold;
+            padding: 16px 0;
+            margin-top: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.6;
+        }
+
+        button:active {
+            opacity: 0.4;
+        }
+
+        .inactive {
+            background: #ddd;
+            color: #444;
+            cursor: default;
+        }
+
+        .inactive:hover {
+            opacity: 1;
+        }
+
+        h6 {
+            color: green;
+            margin: 8px 20px 8px 0;
+            text-align: right;
+        }
+    </style>
+
+
+    <script>
+        'use strict';
+
+        {
+            function selectTimeChange(event) {
+                checkValue = parseInt(selectTime.elements['hotWaterIn'].value);
+                // 文字列を数値に
+                console.log(`設定時間は${checkValue}です`);
+            }
+
+            function check() {
+                // 残り時間 = 終了時刻 - 現在時刻
+                let countdown = endTime - new Date().getTime();
+
+                // (3) タイマーの終了
+                if (countdown < 0) {
+                    clearInterval(intervalId);
+                    countdown = checkValue;
+                    
+                    btn.disabled = false;
+                    voice.play();
+                    btn.classList.remove('inactive');
+                }
+
+                const totalSecond = Math.floor(countdown / 1000);
+                // 80秒 → 1分20秒
+                // 80 ÷ 60 = 1 余り 20
+                // 80 / 60 = 1.33333.... → 1
+                // 80 % 60 = 20
+                const minutes = Math.floor(totalSecond / 60);
+                const seconds = totalSecond % 60;
+
+                const minutesFormatted = String(minutes).padStart(2, '0');
+                const secondsFormatted = String(seconds).padStart(2, '0');
+
+                timer.textContent = `${minutesFormatted}:${secondsFormatted}`;
+            }
+
+            let selectTime = document.querySelector('#selectTime');
+            selectTime.elements[0].checked = true;
+            selectTime.addEventListener('change', selectTimeChange);
+            let checkValue = 180000;
+
+            const timer = document.querySelector('#timer');
+            const btn = document.querySelector('#btn');
+            let endTime;
+            let intervalId;
+
+            const voice = new Audio('ずんだもん_おあがりよう.mp3');
+
+            // (1) 終了時刻を求める
+            btn.addEventListener('click', () => {
+                endTime = new Date().getTime() + checkValue;
+
+                btn.disabled = true;
+                btn.classList.add('inactive');
+
+                // (2) 残り時間を求める
+                intervalId = setInterval(check, 100);
+            });
+
+        }
+    </script>
+
+</body>
+
+</html>
